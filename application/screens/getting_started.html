@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Synchub</title>
+		<link rel="stylesheet" type="text/css" href="getting_started.css">
+		<script src="../public/link.js"></script>
+	</head>
+	<body>
+		<div id="header">
+			<div>Synchub</div>
+		</div>
+
+		<div class="info">Thank you for choosing Synchub for your project(s).</div>
+
+		<div class="info">As you can see, a folder with your username containing your repositories has just been cloned to your desktop.</div>
+
+		<div class="info">Any files or folders you put in your username folder is controllable using our API.</div>
+
+		<h3 id="submit" onclick="start_using()">Done</h3>
+	</body>
+
+	<script>
+		var fs = require('fs')
+		var os = require('os')
+		var unzip = require('unzip')
+		var form_data = new FormData()
+		var start_use = false
+		var userid = localStorage.getItem("userid")
+		var user_repos = os.homedir() + "/Desktop/"
+
+		form_data.append("userid", userid)
+
+		fetch(link + 'get_user_info', { 
+			method: 'POST',
+			body: form_data
+		})
+		.then((response) => response.json())
+		.then((response) => {
+			var error = response.error
+			var username
+
+			if (!error) {
+				username = response.username
+
+				fs.writeFile("files.zip", response.image_data, 'base64', function (err) {
+					fs.createReadStream("files.zip").pipe(unzip.Extract({ path: user_repos + username }));
+					fs.unlinkSync("files.zip")
+
+					start_use = true
+					localStorage.setItem("repos_name", username)
+				});
+			}
+		})
+
+		function start_using()
+		{
+			if (start_use) {
+				location.replace('main.html')
+			}
+		}
+	</script>
+</html>

@@ -1,0 +1,110 @@
+.payment {
+    height: 100vh;
+    width: 100vw;
+}
+
+.payment-form-box {
+	display: flex;
+	flex-direction: column;
+	height: calc(100vh - 207px);
+	justify-content: space-around;
+}
+
+.payment-form .form-row {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.payment-form div {
+	font-size: 13px;
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+
+.default-text,
+.mini-text {
+	border-style: solid;
+	font-size: 15px;
+	font-weight: bold;
+	margin-bottom: 10px;
+	padding: 5px;
+}
+
+.default-text {
+	width: 376px;
+}
+
+.mini-text {
+	border-width: 0 0 1px 0;
+	width: 50px;
+}
+
+.enable-payment-submit {
+
+}
+
+.disable-payment-submit {
+	opacity: 0.5;
+}
+
+.disable-payment-submit:hover {
+	background-color: white;
+	cursor: default;
+	opacity: 0.5;
+}
+
+/* hidden boxes */
+.hidden_boxes {
+	background-color: rgba(0, 0, 0, 0.7);
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	justify-content: space-around;
+	position: fixed;
+	top: 0;
+	width: 100vw;
+}
+
+.hidden-row {
+	display: flex;
+	flex-direction: row;
+	height: 300px;
+	justify-content: space-around;
+	width: 100vw;
+}
+
+.save_credit_info-success,
+.payed-success {
+	background-color: white;
+	border-color: #efefef;
+	border-radius: 5px;
+	border-style: solid;
+	display: flex;
+	flex-direction: column;
+	height: 300px;
+	justify-content: space-around;
+	width: 500px;
+}
+
+.save_credit_info-header,
+.payed-header {
+	text-align: center;
+}
+
+.save_credit_info-button,
+.payed-button {
+	border-radius: 5px;
+	border-style: solid;
+	margin: 0 auto;
+	padding: 10px;
+	text-align: center;
+	width: 100px;
+}
+
+.save_credit_info-button:hover,
+.payed-button:hover {
+	background-color: rgba(0, 0, 0, 0.2);
+	cursor: pointer;
+}
+/* End hidden boxes */

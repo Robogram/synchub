@@ -1,0 +1,42 @@
+* {
+	color: #474747;
+	font-family: sans-serif;
+	border-width: 2px;
+}
+
+body {
+	background-color: #efefef;
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	justify-content: space-between;
+	margin: 0;
+	padding: 0;
+}
+
+#header {
+	font-size: 70px;
+	text-align: center;
+}
+
+.info {
+	font-weight: bold;
+	margin: 0 auto;
+	text-align: center;
+	width: 700px;
+}
+
+#submit {
+	border-radius: 3px;
+	border-style: solid;
+	border-width: 2px;
+	margin: 0 auto 30px auto;
+	padding: 5px;
+	text-align: center;
+	width: 100px;
+}
+
+#submit:hover {
+	background-color: rgba(0, 0, 0, 0.2);
+	cursor: pointer;
+}

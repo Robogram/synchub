@@ -1,0 +1,32 @@
+.getting_started {
+    height: 100vh;
+    width: 100vw;
+}
+
+.getting_started_box {
+	display: flex;
+	flex-direction: column;
+	height: calc(100vh - 130px);
+	justify-content: space-around;
+	margin: 0 auto;
+	text-align: center;
+	width: 590px;
+}
+
+.getting_started-info {
+	font-size: 20px;
+	padding: 70px 0;
+}
+
+.getting_started-download {
+	border-radius: 3px;
+	border-style: solid;
+	margin: 10px auto 100px auto;
+	padding: 5px;
+	width: 100px;
+}
+
+.getting_started-download:hover {
+	background-color: rgba(0, 0, 0, 0.2);
+	cursor: pointer;
+}

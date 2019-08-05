@@ -1,0 +1,33 @@
+.terms {
+    height: 100vh;
+    width: 100vw;
+}
+
+.terms_box {
+	margin: 20px auto;
+	width: 800px;
+}
+
+.terms_box div,
+.terms_box ul,
+.terms_box li {
+	font-family: sans-serif;
+	font-weight: bold;
+}
+
+.terms-main-header {
+	font-size: 20px;
+	margin-bottom: 50px;
+}
+
+.terms-main-about {
+	font-size: 15px;
+}
+
+.terms-main-ruleslist {
+	margin: 100px 0;
+}
+
+.terms-main-ruleslist p {
+	margin-bottom: 100px;
+}

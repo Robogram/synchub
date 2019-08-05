@@ -1,0 +1,30 @@
+.verified {
+    height: 100vh;
+    width: 100vw;
+}
+
+.verified_box {
+	display: flex;
+	flex-direction: column;
+	height: calc(100vh - 130px);
+	justify-content: space-around;
+	text-align: center;
+}
+
+.verified-row {
+	display: flex;
+	flex-direction: column;
+	height: 300px;
+	justify-content: space-between;
+}
+
+.verified-logo-holder {
+	height: 150px;
+	margin: 0 auto;
+	width: 150px;
+}
+
+.verified-logo {
+	height: 150px;
+	width: 150px;
+}

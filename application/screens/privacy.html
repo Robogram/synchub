@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Synchub</title>
+		<link rel="stylesheet" type="text/css" href="authorization.css">
+		<link rel="stylesheet" type="text/css" href="privacy.css">
+	</head>
+	<body>
+		<script>
+			if (localStorage.getItem("userid") != null) {
+				location.replace("main.html")
+			}
+		</script>
+
+		<div id="header">
+			<div><img id="logo" src="../public/images/logo.png"></div>
+			<div id="user_options-box">
+				<div class="user_option" onclick="javascript:location.replace('register.html')">Sign-Up</div>
+				<div class="user_option" onclick="javascript:location.replace('login.html')">Sign-In</div>
+				<div class="user_option" onclick="javascript:location.replace('recover_password.html')">Recover Password</div>
+				<div class="user_option" onclick="javascript:location.replace('terms.html')">Terms</div>
+			</div>
+		</div>
+
+		<div id="info-box">
+			<h4 id="info-header">Privacy</h4>
+			<h4 id="info-last_updated">Last Updated: Thursday, December 6, 2018</h4>
+			<h4 id="info-main-about">Thank you for choosing to use Synchub to manage your project(s). The terms below will layout all the rules you must follow in order to use the service. By reading and understanding the rules below, you will be eligible to use the service without any worries of future consequences.</h4>
+
+			<ul id="ruleslist">
+				<li class="list-header">What personal information do we collect from every user ?</li>
+        		<ul>
+                    <li className="inner_list">E-mail</li>
+                    <li className="inner_list">Username</li>
+                    <li className="inner_list">Password</li>
+                    <li className="inner_list">Credit Card (only when ask for payment)</li>
+                </ul>
+
+                <li class="list-header">When do we collect information ?</li>
+                <p>We collect your username and e-mail during registration. We will only collect your
+                credit card information when we ask to charge you</p>
+
+                <li class="list-header">How do we use your information ?</li>
+                <p>We will process and charge you programmically only when neccesary. We will use your e-mail 
+                to send you updates about our service and password reset request if you ever 
+                forget your password</p>
+
+                <li class="list-header">How do we protect your information and data ?</li>
+                <p>We only be asking for information we need and when neccesary. We promise we will never share any of 
+                your information and data with other websites.</p>
+			</ul>
+		</div>
+	</body>
+</html>

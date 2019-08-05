@@ -1,0 +1,58 @@
+@font-face {
+	font-family: ssPro;
+	src: url(public/fonts/SourceSansPro-Black.ttf);
+}
+
+* {
+	color: #474747;
+	font-family: ssPro;
+	border-width: 2px;
+}
+
+body {
+	background-color: #efefef;
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	justify-content: space-between;
+	margin: 0;
+	padding: 0;
+}
+
+#header {
+	font-size: 70px;
+	text-align: center;
+}
+
+#info-box {
+	height: calc(100vh - 200px);
+	margin: 0 auto;
+	width: 80vw;
+}
+
+#info-box h4 {
+	font-family: sans-serif;
+	margin-bottom: 30px;
+}
+
+#ruleslist li,
+#ruleslist p {
+	font-family: sans-serif;
+}
+
+#ruleslist ul {
+	margin-bottom: 50px;
+}
+
+#ruleslist p {
+	margin-bottom: 50px;
+}
+
+#info-header {
+	text-align: center;
+}
+
+#info-last_updated {
+	font-size: 13px;
+	text-align: center;
+}

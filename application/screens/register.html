@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Synchub</title>
+		<link rel="stylesheet" type="text/css" href="authorization.css">
+		<script src="../public/link.js"></script>
+	</head>
+	<body>
+		<script>
+			if (localStorage.getItem("userid") != null) {
+				location.replace("main.html")
+			}
+		</script>
+
+		<div id="header">
+			<div><img id="logo" src="../public/images/logo.png"></div>
+			<div id="user_options-box">
+				<div class="user_option" onclick="javascript:location.replace('login.html')">Sign-In</div>
+				<div class="user_option" onclick="javascript:location.replace('recover_password.html')">Recover Password</div>
+				<div class="user_option" onclick="javascript:location.replace('terms.html')">Terms</div>
+				<div class="user_option" onclick="javascript:location.replace('privacy.html')">Privacy</div>
+			</div>
+		</div>
+
+		<div id="info">Manage your repositories synchronously using an API. No more (CLI) Command-Line-Interface</div>
+
+		<div id="form-box">
+			<div id="form-header">Register</div>
+			<div class="form-item">
+				<div>Username:</div>
+				<input id="username" type="text">
+			</div>
+			<div class="form-item">
+				<div>E-mail:</div>
+				<input id="email" type="text">
+			</div>
+			<div class="form-item">
+				<div>Password:</div>
+				<input id="password" type="password">
+			</div>
+			<div class="form-item">
+				<div>Confirm Password:</div>
+				<input id="confirmpassword" type="password">
+			</div>
+			<div id="form-error"></div>
+
+			<h3 id="submit" onclick="register()">Register</h3>
+		</div>
+
+		<script>
+			function register()
+			{
+				var date = new Date()
+				var form_data = new FormData()
+				var inputs = {'username': '', 'email': '', 'password': '', 'confirmpassword': ''}
+
+				;['username', 'email', 'password', 'confirmpassword'].forEach(function (input_name) {
+					inputs[input_name] = document.getElementById(input_name).value
+				})
+
+				form_data.append('username', inputs['username'])
+				form_data.append('email', inputs['email'])
+				form_data.append('password', inputs['password'])
+				form_data.append('confirmpassword', inputs['confirmpassword'])
+
+				fetch(link + 'register', { 
+					method: 'POST',
+					body: form_data
+				})
+				.then((response) => response.json())
+				.then((response) => {
+					var error = response.error
+					var userid, error_message
+
+					if (!error) {
+						userid = response.userid
+
+						localStorage.setItem("userid", userid)
+
+						location.replace('create_repos.html')
+					} else {
+						error_message = response.error_message
+
+						document.getElementById("form-error").innerHTML = error_message
+					}
+				})
+				.catch((error) => {
+
+				})
+			}
+		</script>
+	</body>
+</html>

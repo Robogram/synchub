@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Synchub</title>
+		<link rel="stylesheet" type="text/css" href="authorization.css">
+		<script src="../public/link.js"></script>
+	</head>
+	<body>
+		<script>
+			if (localStorage.getItem("userid") != null) {
+				location.replace("main.html")
+			}
+		</script>
+		
+		<div id="header">
+			<div><img id="logo" src="../public/images/logo.png"></div>
+			<div id="user_options-box">
+				<div class="user_option" onclick="javascript:location.replace('register.html')">Sign-Up</div>
+				<div class="user_option" onclick="javascript:location.replace('recover_password.html')">Recover Password</div>
+				<div class="user_option" onclick="javascript:location.replace('terms.html')">Terms</div>
+				<div class="user_option" onclick="javascript:location.replace('privacy.html')">Privacy</div>
+				<!-- end -->
+			</div>
+		</div>
+			
+		<div id="info">Manage your repositories synchronously using an API. No more (CLI) Command-Line-Interface</div>
+
+		<div id="form-box">
+			<div id="form-header">Log-In</div>
+			<div class="form-item">
+				<div>Username:</div>
+				<input id="username" type="text">
+			</div>
+			<div class="form-item">
+				<div>Password:</div>
+				<input id="password" type="password">
+			</div>
+			<div id="form-error"></div>
+
+			<h3 id="submit" onclick="login()">Sign-In</h3>
+		</div>
+
+		<script>
+			function login()
+			{
+				var form_data = new FormData()
+				var inputs = {'username': '', 'password': ''}
+
+				;['username', 'password'].forEach(function (input_name) {
+					inputs[input_name] = document.getElementById(input_name).value
+				})
+
+				form_data.append('username', inputs['username'])
+				form_data.append('password', inputs['password'])
+
+				fetch(link + 'login', { 
+					method: 'POST',
+					body: form_data
+				})
+				.then((response) => response.json())
+				.then((response) => {
+					var error = response.error
+					var userid, repos_name, num_repos, error_message
+
+					if (!error) {
+						userid = response.userid
+						repos_name = response.repos_name
+						num_repos = response.num_repos
+
+						localStorage.setItem("userid", userid)
+						localStorage.setItem("repos_name", repos_name)
+
+						if (num_repos > 0) {
+							location.replace('main.html')
+						} else {
+							location.replace('create_repos.html')
+						}
+					} else {
+						error_message = response.error_message
+
+						document.getElementById("form-error").innerHTML = error_message
+					}
+				})
+			}
+		</script>
+	</body>
+</html>

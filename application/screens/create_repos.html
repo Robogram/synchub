@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Synchub</title>
+		<link rel="stylesheet" type="text/css" href="authorization.css">
+		<script src="../public/link.js"></script>
+	</head>
+	<body>
+		<div id="header">
+			<div id="logout" onclick="logout()">Log-Out</div>
+			<div><img id="logo" src="../public/images/logo.png"></div>
+		</div>
+
+		<div id="info">Manage your repositories synchronously using an API. No more (CLI) Command-Line-Interface</div>
+
+		<div id="form-box">
+			<div id="form-header">Create your first repository</div>
+			<div class="form-item">
+				<div>Repository Name:</div>
+				<input id="repos-name" type="text">
+			</div>
+			<div id="form-error"></div>
+
+			<h3 id="submit" onclick="create()">Create</h3>
+		</div>
+	</body>
+
+	<script>
+		function logout()
+		{
+			localStorage.clear()
+			location.replace('login.html')
+		}
+
+		function create()
+		{
+			var form_data = new FormData()
+			var userid = localStorage.getItem("userid")
+			var repos_name = document.getElementById("repos-name").value
+
+			form_data.append('userid', userid)
+			form_data.append('repos-name', repos_name)
+
+			fetch(link + 'create_repos', {
+				method: 'POST',
+				body: form_data
+			})
+			.then((response) => response.json())
+			.then((response) => {
+				var error = response.error
+				var error_message
+
+				if (!error) {
+					location.replace('getting_started.html')
+				} else {
+					error_message = response.error_message
+
+					document.getElementById("form-error").innerHTML = error_message
+				}
+			})
+		}
+	</script>
+</html>

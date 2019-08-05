@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Synchub</title>
+		<link rel="stylesheet" type="text/css" href="authorization.css">
+		<link rel="stylesheet" type="text/css" href="terms.css">
+	</head>
+	<body>
+		<script>
+			if (localStorage.getItem("userid") != null) {
+				location.replace("main.html")
+			}
+		</script>
+
+		<div id="header">
+    		<div><img id="logo" src="../public/images/logo.png"></div>
+    		<div id="user_options-box">
+    			<div class="user_option" onclick="javascript:location.replace('register.html')">Sign-Up</div>
+    			<div class="user_option" onclick="javascript:location.replace('login.html')">Sign-In</div>
+                <div class="user_option" onclick="javascript:location.replace('recover_password.html')">Recover Password</div>
+    			<div class="user_option" onclick="javascript:location.replace('privacy.html')">Privacy</div>
+    		</div>
+		</div>
+
+		<div id="info-box">
+			<h4 id="info-header">Terms</h4>
+			<h4 id="info-last_updated">Last Updated: Thursday, December 6, 2018</h4>
+			<h4 id="info-main-about">
+				Welcome to Synchub. We are very happy you chose to be here to manage your projects.
+
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+
+                By using the Platform, you agree to the Terms. You should be able to follow the Rules 
+                easily since it's really simple.
+
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+
+                Please read these Terms carefully before accessing or using the platform. 
+                By accessing or using any part of the site, you agree to be bound by these 
+                Terms. If you do not agree to all the terms of this agreement, then you 
+                may not access the website or use any services. If these Terms are considered 
+                an offer, acceptance is expressly limited to these Terms.
+
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+
+                Our Platform is hosted on DigitalOcean. They provide us all the tools we need 
+                to keep you and your information secure at all times.
+			</h4>
+
+			<ul id="ruleslist">
+				<li class="list-header">Accuracy, Completeness and Timeliness or Information</li>
+                <p>We are not responsible if information made available on this site is not accurate, 
+                complete or current. The material on this site is provided for general information 
+                only and should not be relied upon or used as the sole basis for making decisions 
+                without consulting primary, more accurate, more complete or more timely sources of 
+                information. Any reliance on the material on this site is at your own risk. This 
+                site may contain certain historical information. Historical information, necessarily, 
+                is not current and is provided for your reference only. We reserve the right to modify 
+                the contents of this site at any time, but we have no obligation to update any 
+                information on our site. You agree that it is your responsibility to monitor changes 
+                to our site.</p>
+
+                <li class="list-header">Personal Information</li>
+                <p>The use of personal information through the site is stated by our <a onclick="javascript:location.replace('privacy.html')">Privacy</a>.</p>
+
+                <li class="list-header">Disclaimer of Warranties; Limitation of Liability</li>
+                <p>We do not guarantee, represent or warrant that your use of our service will be uninterrupted, 
+                timely, secure or error-free. We do not warrant that the results that may be obtained from 
+                the use of the service will be accurate or reliable. You agree that from time to time we may 
+                remove the service for indefinite periods of time or cancel the service at any time, without 
+                notice to you.</p>
+
+                <li class="list-header">Indemnification</li>
+                <p>You agree to indemnify, defend and hold harmless Synchub and our parent, subsidiaries, affiliates, 
+                partners, officers, directors, agents, contractors, licensors, service providers, subcontractors, 
+                suppliers, interns and employees, harmless from any claim or demand, including reasonable attorneys’ 
+                fees, made by any third-party due to or arising out of your breach of these Terms or the documents 
+                they incorporate by reference, or your violation of any law or the rights of a third-party.</p>
+
+                <li class="list-header">Severability</li>
+                <p>In the event that any provision of these Terms is determined to be unlawful, void or unenforceable, 
+                such provision shall nonetheless be enforceable to the fullest extent permitted by applicable law, and 
+                the unenforceable portion shall be deemed to be severed from these Terms, such determination shall not 
+                affect the validity and enforceability of any other remaining provisions.</p>
+
+                <li class="list-header">Entire Agreement</li>
+                <p>The failure of us to exercise or enforce any right or provision of these Terms shall not constitute a 
+                waiver of such right or provision. These Terms and any policies or operating rules posted by us on this 
+                site or in respect to The Service constitutes the entire agreement and understanding between you and 
+                us and govern your use of the Service, superseding any prior or contemporaneous agreements, communications 
+                and proposals, whether oral or written, between you and us (including, but not limited to, any prior 
+                versions of the Terms). Any ambiguities in the interpretation of these Terms shall not be construed 
+                against the drafting party.</p>
+
+                <li class="list-header">Changes to Terms of Use</li>
+                <p>You can review the most current version of the Terms at any time at this page. We reserve the right, 
+                at our sole discretion, to update, change or replace any part of these Terms by posting updates and changes 
+                to our website. It is your responsibility to check our website periodically for changes. Your continued use 
+                of or access to our website or the Service following the posting of any changes to these Terms constitutes 
+                acceptance of those changes.</p>
+			</ul>
+		</div>
+	</body>
+</html>

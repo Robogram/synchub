@@ -1,0 +1,52 @@
+.privacy {
+    height: 100vh;
+    width: 100vw;
+}
+
+.privacy-header {
+	background-color: white;
+	box-shadow: 1px 0px 5px black;
+	width: 100vw;
+}
+
+.privacy-header-row {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	margin: 0 auto;
+	width: 145px;
+}
+
+.privacy_box {
+	font-family: arial;
+	margin: 20px auto;
+	width: 700px;
+}
+
+.privacy_box div,
+.privacy_box ul,
+.privacy_box li {
+	font-family: sans-serif;
+	font-weight: bold;
+}
+
+.privacy-main-header {
+	font-size: 20px;
+	margin-bottom: 50px;
+}
+
+.privacy-main-about {
+	font-size: 15px;
+}
+
+.privacy-main-ruleslist {
+	margin: 100px 0;
+}
+
+.privacy-main-ruleslist ul {
+	margin: 20px 0 100px 10px;
+}
+
+.privacy-main-ruleslist p {
+	margin: 20px 0 100px 20px;
+}

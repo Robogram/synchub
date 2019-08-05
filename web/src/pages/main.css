@@ -1,0 +1,262 @@
+/* setting bar */
+.setting_bar {
+    display: flex;
+    flex-direction: column;
+    height: 32px;
+    justify-content: space-between;
+    margin: -42px 0 20px 10px;
+    width: 50px;
+}
+
+.setting_bar:hover .setting-bar {
+    background-color: grey;
+    cursor: pointer;
+}
+
+.setting-bar {
+    background-color: black;
+    border-radius: 5px;
+    height: 5px;
+    width: 50px;
+}
+/* End setting bar */
+
+.main-body {
+    display: flex;
+    flex-direction: row;
+    height: calc(100vh - 62px);
+    justify-content: space-between;
+    margin-top: 10px;
+    width: 100vw;
+}
+
+.user_info-username {
+    font-size: 12px;
+    padding: 10px;
+}
+
+.file_list-box {
+    height: calc(100vh - 240px);
+    margin: 20px 10px 0 10px;
+    overflow-y: scroll;
+}
+
+.file {
+    border-radius: 5px;
+    border-style: solid;
+    margin: 2px;
+    padding: 5px;
+    text-align: center;
+    width: 200px;
+}
+
+.file:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+.download_button,
+.all_actions_button {
+    border-radius: 5px;
+    border-style: solid;
+    margin: 20px 0 0 12px;
+    padding: 5px;
+    text-align: center;
+    width: 200px;
+}
+
+.download_button a {
+    color: black;
+    padding: 4px 28px;
+}
+
+.download_button:hover,
+.all_actions_button:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+/* source code box */
+.info-box {
+    overflow: hidden;
+    width: calc(100vw - 260px);
+}
+
+.used-bytes,
+.file_directory {
+    margin-bottom: 10px;
+}
+
+.path:hover {
+    color: #404040;
+    cursor: pointer;
+}
+
+.file_info {
+    background-color: rgba(0, 0, 0, 0.01);
+    border-style: solid;
+    border-width: 1px 0 0 1px;
+}
+
+.file_data {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px;
+    width: 50vw;
+}
+
+.file_sourcecode {
+    background-color: white;
+    height: calc(100vh - 157px);
+    overflow-y: scroll;
+    padding-left: 10px;
+}
+
+.image-holder {
+    height: calc(100vh - 129px);
+    width: calc(100vw - 271px);
+}
+
+.prettyprint {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.file_text-header {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    justify-content: space-around;
+    text-align: center;
+}
+/* End source code box */
+
+/* user actions list */
+.user_action_box {
+    height: calc(100vh - 62px);
+    overflow-y: scroll;
+}
+
+.user_action {
+    margin-bottom: 50px;
+}
+
+.user_action-header {
+    font-size: 25px;
+}
+
+.user_action-list {
+    padding: 20px;
+}
+
+.user_action_record {
+    margin-bottom: 20px;
+    padding: 10px;
+}
+
+.user_action_record-date {
+    margin-bottom: 10px;
+}
+
+.action_file {
+    background-color: white;
+    border-color: #CDCDCD;
+    border-radius: 10px;
+    border-style: solid;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    padding: 10px;
+}
+/* End user actions list */
+
+.unverified-header {
+    background-color: #DFDFDF;
+    border-style: solid;
+    border-width: 0 0 1px 0;
+    padding: 17px 10px;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    z-index: 1;
+}
+
+/* settings */
+.settings {
+    display: none;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    width: 100vw;
+}
+
+.settings-box {
+    background-color: white;
+    height: calc(100vh - 10px);
+    padding-top: 10px;
+    position: absolute;
+    width: 300px;
+    z-index: 1;
+}
+
+.settings_close {
+    border-radius: 25px;
+    border-style: solid;
+    height: 40px;
+    margin: 0 0 -46px 240px;
+    width: 40px;
+}
+
+.settings_close:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+    cursor: pointer;
+}
+
+.settings_close div {
+    background-color: black;
+    border-radius: 5px;
+    height: 5px;
+    width: 35px;
+}
+
+.settings-close-left {
+    margin: 18px 0 -5px 2px;
+    transform: rotate(45deg);
+}
+
+.settings-close-right {
+    margin-left: 2px;
+    transform: rotate(-45deg);
+}
+
+.setting-navbar {
+    border-radius: 2px;
+    border-style: solid;
+    border-width: 2px;
+    font-size: 15px;
+    margin: 0 0 10px 10px;
+    padding: 10px;
+    text-align: center;
+    width: 150px;
+}
+
+.setting-navbar a {
+    margin-left: -10px;
+    padding: 9px 59px;
+}
+
+.setting-navbar:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+.settings-background {
+    background-color: rgba(0, 0, 0, 0.7);
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    width: 100vw;
+}
+/* End settings */

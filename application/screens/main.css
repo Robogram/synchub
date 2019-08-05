@@ -1,0 +1,474 @@
+* {
+	font-family: sans-serif;
+	border-width: 2px;
+	outline: none;
+}
+
+body {
+	background-color: #efefef;
+	padding: 0;
+	margin: 0;
+}
+
+#main-body {
+	margin: 20px;
+	padding: 0;
+}
+
+#main-options {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	width: 430px;
+}
+
+#logout,
+#create-repos,
+#report-bug {
+	background-color: white;
+	border-radius: 3px;
+	border-style: solid;
+	font-size: 10px;
+	margin: 10px 0;
+	padding: 5px;
+	text-align: center;
+	width: 90px;
+}
+
+#help {
+	background-color: white;
+	border-radius: 3px;
+	display: flex;
+	font-size: 10px;
+	justify-content: space-between;
+	margin: 10px 0;
+	padding: 5px;
+	text-align: center;
+	width: 80px;
+}
+
+#help:hover {
+	background-color: rgba(0, 0, 0, 0.1);
+	cursor: pointer;
+}
+
+#help-icon-header {
+	font-weight: bold;
+	padding: 3px 0 0 3px;
+}
+
+#help-icon {
+	background-color: rgba(127, 127, 127, 0.5);
+	border-radius: 20px;
+	font-size: 15px;
+	font-weight: bold;
+	width: 17px;
+}
+
+#main-options div a {
+	color: black;
+	padding: 5px 16px;
+	text-decoration: none;
+}
+
+#logout:hover,
+#create-repos:hover,
+#report-bug:hover {
+	background-color: rgba(0, 0, 0, 0.2);
+	cursor: pointer;
+}
+
+#local_directory-header,
+#committed_directory-header {
+	font-size: 15px;
+	font-weight: bold;
+	margin-bottom: -5px;
+	padding: 5px;
+}
+
+.path:hover {
+	color: #404040;
+	cursor: pointer;
+}
+
+#committed-size {
+	font-weight: bold;
+}
+
+[id$="_box_holder"] {
+	background-color: white;
+	border-style: solid;
+	min-height: 100px;
+	margin-bottom: 10px;
+	overflow: hidden;
+}
+
+.add_file,
+.delete_file,
+.enter_folder,
+.remove_file,
+.commit_file,
+.uncommit_file,
+.pull_file {
+	background-color: white;
+	border-radius: 2px;
+	border-style: solid;
+	border-width: 1px;
+	font-size: 9px;
+	font-weight: bold;
+	margin-left: 5px;
+	padding: 5px;
+	text-align: center;
+	width: 89px;
+}
+
+.added_file {
+	background-color: #BFBFBF;
+	border-radius: 2px;
+	color: grey;
+	font-size: 10px;
+	font-weight: bold;
+	padding: 5px;
+	text-align: center;
+	width: 90px;
+}
+
+.add_file:hover,
+.delete_file:hover,
+.enter_folder:hover,
+.remove_file:hover,
+.commit_file:hover,
+.uncommit_file:hover,
+.pull_file:hover {
+	background-color: #E7E7E7;
+	cursor: pointer;
+}
+
+.box-header {
+	display: flex;
+	flex-direction: row;
+	font-size: 20px;
+	font-weight: bold;
+	justify-content: space-around;
+	padding: 20px 0 5px 0;
+	text-align: center;
+}
+
+.files-actions {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	margin: 5px auto;
+	padding: 0 5px;
+	width: 400px;
+}
+
+#local_files_box,
+#committed_box {
+	min-height: 200px;
+	max-height: 400px;
+}
+
+#added_box {
+	max-height: 400px;
+}
+
+#local_files_box,
+#added_box,
+#committed_box {
+	overflow-y: scroll;
+}
+
+[id$="_all_button"] {
+	border-radius: 3px;
+	border-style: solid;
+	font-size: 10px;
+	font-weight: bold;
+	padding: 5px;
+	text-align: center;
+	width: 70px;
+}
+
+[id$="_all_button"]:hover {
+	background-color: rgba(0, 0, 0, 0.2);
+	cursor: pointer;
+}
+
+#files_box-holder {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.local_file,
+.file {
+	background-color: #EAEAEA;
+	border-color: #EAEAEA;
+	border-radius: 3px;
+	border-style: solid;
+	border-width: 1px;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	margin: 5px;
+	padding: 5px;
+}
+
+.file-name {
+	font-size: 13px;
+	font-weight: bold;
+	margin-top: 5px;
+}
+
+.file-actions {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+}
+
+.file-actions div {
+	font-size: 10px;
+	width: 100px;
+}
+
+/* hidden boxes */
+#hidden_box {
+	background-color: rgba(0, 0, 0, 0.7);
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	justify-content: space-around;
+	position: fixed;
+	top: 0;
+	width: 100vw;
+}
+
+#create_repos_box,
+#retrieve_box {
+	background-color: white;
+	border-color: #efefef;
+	border-radius: 5px;
+	border-style: solid;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	height: 400px;
+	margin: 0 auto;
+	width: 400px;
+}
+
+#help_box {
+	background-color: white;
+	border-color: #efefef;
+	border-radius: 5px;
+	border-style: solid;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	height: 80vh;
+	margin: 0 auto;
+	width: 80vw;
+}
+
+#help-header {
+	font-size: 20px;
+	padding: 10px 0;
+	text-align: center;
+}
+
+#help-instructions {
+	height: 60vh;
+	margin: 20px 50px;
+	overflow-y: scroll;
+	width: calc(80vw - 100px);
+}
+
+.help-instruction {
+	margin-bottom: 50px;
+}
+
+.button-instruction {
+	margin-bottom: 50px;
+}
+
+[id$="_all_button-ex"] {
+	border-radius: 3px;
+	border-style: solid;
+	font-size: 10px;
+	font-weight: bold;
+	padding: 5px;
+	text-align: center;
+	width: 100px;
+}
+
+.ex-header {
+	margin: 10px;
+}
+
+.ex-image-holder {
+	text-align: center;
+}
+
+.ex-image {
+	width: 60vw;
+}
+
+#help-options {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	margin: 0 auto;
+	width: 100px;
+}
+
+#help-options div {
+	font-size: 30px;
+	font-weight: bold;
+}
+
+#help-options div:hover {
+	color: rgba(0, 0, 0, 0.5);
+	cursor: pointer;
+}
+
+#confirmation_box,
+#error_box,
+#success_box {
+	background-color: white;
+	border-color: #efefef;
+	border-radius: 5px;
+	border-style: solid;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	height: 330px;
+	margin: 0 auto;
+	width: 400px;
+}
+
+#success_box {
+	justify-content: space-around;
+}
+
+#create_repos-close,
+#help-close {
+	border-radius: 5px;
+	border-style: solid;
+	border-width: 1px;
+	padding: 2px;
+	text-align: center;
+	width: 50px;
+}
+
+#create_repos-close {
+	margin: -20px 0 -20px 10px;
+}
+
+#help-close {
+	margin: 10px auto;
+}
+
+#create_repos-close:hover,
+#help-close:hover {
+	background-color: rgba(0, 0, 0, 0.2);
+	cursor: pointer;
+}
+
+#create_repos-header,
+#retrieve-header,
+#confirmation-header,
+#error-header,
+#success-header {
+	font-weight: bold;
+	margin: 0 20px;
+	padding: 10px 0;
+	text-align: center;
+}
+
+#create_repos-form {
+	width: 400px;
+}
+
+#create_repos-input {
+	background-color: rgba(0, 0, 0, 0.2);
+	border-color: grey;
+	border-style: solid;
+	font-size: 15px;
+	font-weight: bold;
+	margin: 10px 0 0 18px;
+	padding: 5px;
+	width: 350px;
+}
+
+#form-error {
+	color: darkred;
+	margin: 10px 0 0 18px;
+}
+
+#create_repos-button {
+	border-radius: 3px;
+	border-style: solid;
+	border-width: 2px;
+	margin: 5px 0 0 18px;
+	padding: 3px;
+	text-align: center;
+	width: 100px;
+}
+
+#create_repos-button:hover {
+	background-color: rgba(0, 0, 0, 0.2);
+	cursor: pointer;
+}
+
+#confirmation-fileslist {
+	height: 190px;
+	margin: 0 auto;
+	overflow-y: scroll;
+	text-align: center;
+	width: 390px;
+}
+
+.confirmation-file {
+	background-color: #ededed;
+	border-radius: 3px;
+	font-size: 13px;
+	margin: 2px 0;
+	padding: 8px;
+}
+
+#confirmation-num-files {
+	font-weight: bold;
+	padding: 2px 0;
+	text-align: center;
+}
+
+#confirmation-button-holder,
+#error-button-holder {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	margin: 20px auto;
+	width: 200px;
+}
+
+#confirmation-button-holder div,
+#error-button-holder div {
+	border-radius: 5px;
+	border-style: solid;
+	padding: 5px 10px;
+	text-align: center;
+	width: 50px;
+}
+
+#confirmation-button-holder div:hover,
+#error-button-holder div:hover {
+	background-color: rgba(0, 0, 0, 0.2);
+	cursor: pointer;
+}
+
+#confirmation-progressing {
+	font-weight: bold;
+	padding: 5px 0;
+	text-align: center;
+}
+/* End hidden boxes */

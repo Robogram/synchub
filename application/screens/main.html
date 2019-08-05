@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Synchub</title>
+		<link rel="stylesheet" type="text/css" href="main.css">
+		<script src="../public/link.js"></script>
+	</head>
+	<body>
+		<script>
+			if (localStorage.getItem("userid") != null && localStorage.getItem("repos_name")) {
+				var userid = localStorage.getItem("userid")
+				var repos_name = localStorage.getItem("repos_name")
+				var repos_size_limit = 15000000
+			} else {
+				location.replace('login.html')
+			}
+		</script>
+		<div id="main-body">
+			<div id="main-options">
+				<div id="logout" onclick="logout()">Log-Out</div>
+				<div id="create-repos" onclick="toggle_create_repos_box('open')">Create repository</div>
+				<div id="report-bug"><a href="mailto:admin@geottuse.com">Report a bug</a></div>
+				<div id="help" onclick="toggle_help_box('open')"><div id="help-icon-header">How to use</div> <div id="help-icon">?</div></div>
+			</div>
+			<div id="local_box_holder">
+				<div id="local_directory-header">Directory: Desktop</div>
+				<div class="box-header">Local File(s) / Folder(s) List</div>
+				<div class="files-actions">
+					<div id="add_all_button" onclick="add_files('all')">Add All</div>
+					<div id="reset_all_button" onclick="get_local_files()">Refresh</div>
+					<div id="delete_all_button" onclick="open_confirmation_box('delete_local_files', 'all');">Delete All</div>
+				</div>
+				<div id="local_files_box"></div>
+			</div>
+			<div id="added_box_holder">
+				<div class="box-header">Added File(s) / Folder(s)</div>
+				<div class="files-actions">
+					<div id="remove_all_button" onclick="remove_files('all', '')">Remove All</div>
+					<div id="commit_all_button" onclick="open_confirmation_box('commit_files', 'all');">Commit All</div>
+				</div>
+				<div id="added_box"></div>
+			</div>
+			<div id="committed-size"></div>
+			<div id="committed_box_holder">
+				<div id="committed_directory-header">Directory: </div>
+				<div class="box-header">Committed File(s) / Folder(s)</div>
+				<div class="files-actions">
+					<div id="delete_files_all_button" onclick="open_confirmation_box('delete_files', 'all');">Delete All</div>
+					<div id="reset_all_button" onclick="reset_committed_list();">Refresh</div>
+					<div id="pull_all_button" onclick="open_confirmation_box('pull_files', 'all');">Pull All</div>
+				</div>
+				<div id="committed_box"></div>
+			</div>
+		</div>
+
+		<div id="hidden_box" style="display: none;">
+			<div id="retrieve_box" style="display: none;">
+				<div id="retrieve-header">auto-pulling repository...</div>
+			</div>
+
+			<div id="create_repos_box" style="display: none;">
+				<div id="create_repos-close" onclick="toggle_create_repos_box('close')">Close</div>
+
+				<div id="create_repos-header">Enter a repository name</div>
+
+				<div id="create_repos-form">
+					<input type="text" id="create_repos-input">
+					<div id="form-error"></div>
+				</div>
+
+				<div id="create_repos-button" onclick="create_repos();">Create</div>
+			</div>
+
+			<div id="help_box" style="display: none;">
+				<div id="help-header">Hi username, let's get you started</div>
+
+				<div id="help-instructions">
+					<div class="help-instruction">1. As you can see, you have a folder on your desktop with your username containing your repository(s). </div>
+					<div class="help-instruction">2. You need to manually add files/folders to your repository(s) in order for them to be added, committed and pulled by API</div>
+					<div class="help-instruction">
+						<div class="button-instruction">
+							3. 
+							<div id="add_all_button-ex">Add / Add All</div>
+							<div class="ex-header">
+								The 'Add / Add All' button is use to add files/folders in order for them
+								to be committed
+							</div>
+							<div class="ex-image-holder"><img class="ex-image" src="../public/images/added_box.jpeg"></div>
+						</div>
+						<div class="button-instruction">
+							4. 
+							<div id="commit_all_button-ex">Commit / Commit All</div>
+							<div class="ex-header">
+								The 'Commit / Commit All' button is use to upload your files/folders once its added
+							</div>
+							<div class="ex-image-holder"><img class="ex-image" src="../public/images/committed_box.jpeg"></div>
+						</div>
+						<div class="button-instruction">
+							5. 
+							<div id="add_all_button-ex">Pull / Pull All</div>
+							<div class="ex-header">
+								The 'Pull / Pull All' button is use to pull files/folders to your local folder
+							</div>
+							<div class="ex-image-holder"><img class="ex-image" src="../public/images/local_box.jpeg"></div>
+						</div>
+					</div>
+				</div>
+
+				<div id="help-close" onclick="toggle_help_box('close')">Close</div>
+			</div>
+
+			<div id="confirmation_box" style="display: none;">
+				<div id="confirmation-header"></div>
+				<div id="confirmation-fileslist">
+				</div>
+				<div id="confirmation-num-files"></div>
+				<div id="confirmation-button-holder">
+					<div id="confirmation-button-no" onclick="close_hidden_box()">No</div>
+					<div id="confirmation-button-yes">Yes</div>
+				</div>
+				<div id="confirmation-progressing" style="display: none;">progressing....</div>
+			</div>
+
+			<div id="error_box" style="display: none;">
+				<div id="error-header"></div>
+				<div id="error-button-holder">
+					<div id="error-button-ok" onclick="close_hidden_box()">Ok</div>
+				</div>
+			</div>
+
+			<div id="success_box" style="display: none;">
+				<div id="success-header"></div>
+			</div>
+		</div>
+	</body>
+
+	<script>
+		function logout()
+		{
+			localStorage.clear()
+
+			location.replace("login.html")
+		}
+
+		function create_repos()
+		{
+			document.getElementById("form-error").style.display = "none"
+
+			var fs = require('fs-extra')
+
+			var repos_name = document.getElementById("create_repos-input").value
+
+			if (repos_name) {
+				fs.mkdirSync(user_repos + "/" + repos_name)
+
+				toggle_create_repos_box('close')
+				get_local_files()
+			} else {
+				document.getElementById("form-error").style.display = "block"
+			}
+		}
+
+		function toggle_help_box(action_type) {
+			var hidden_box = document.getElementById("hidden_box")
+			var help_box = document.getElementById("help_box")
+			var help_header = document.getElementById("help-header")
+
+			if (action_type == 'open') {
+				hidden_box.style.display = "flex"
+				help_box.style.display = "flex"
+				help_header.innerHTML = "Hi " + repos_name + ", let's get you started"
+			} else {
+				hidden_box.style.display = "none"
+				help_box.style.display = "none"
+			}
+		}
+
+		function is_folder_exist()
+		{
+			var fs = require('fs-extra'), os = require('os')
+			var dir, is_exist, answer = false
+			var installing_dir = os.homedir() + "/.synchub"
+
+			dir = fs.readdirSync(os.homedir())
+
+			is_exist = dir.indexOf('.synchub')
+
+			if (is_exist > -1) {
+				answer = true
+			} else {
+				fs.mkdirSync(installing_dir)
+
+				answer = true
+			}
+
+			return answer
+		}
+
+		function is_local_folder_exist()
+		{
+			var hidden_box = document.getElementById("hidden_box")
+			var retrieve_box = document.getElementById("retrieve_box")
+			var retrieve_header = document.getElementById("retrieve-header")
+			var fs = require('fs-extra')
+			var os = require('os')
+			var unzip = require('unzip')
+			var form_data = new FormData()
+			var dir, is_exist, installing_dir = os.homedir() + "/Desktop"
+			var success
+
+			dir = fs.readdirSync(installing_dir)
+
+			is_exist = dir.indexOf(repos_name)
+
+			form_data.append('userid', userid)
+
+			if (is_exist == -1) {
+				hidden_box.style.display = "flex"
+				retrieve_box.style.display = 'flex'
+
+				fetch(link + 'reclone_repos', {
+					method: 'POST',
+					body: form_data
+				})
+				.then((response) => response.json())
+				.then((response) => {
+					var error = response.error
+					var error_type
+
+					if (!error) {
+						local_files = response.local_files
+						committed_files = response.committed_files
+
+						reset_interface()
+
+						fs.writeFileSync(committing_folder + "/" + repos_name + ".zip", response.image_data, 'base64')
+						fs.createReadStream(committing_folder + "/" + repos_name + ".zip").pipe(unzip.Extract({ path: os.homedir() + "/Desktop/" + repos_name }))
+
+						fs.unlinkSync(committing_folder + "/" + repos_name + ".zip")
+
+						hidden_box.style.display = "none"
+						retrieve_box.style.display = 'none'
+					} else {
+						retrieve_box.style.display = 'none'
+						confirmation_box.style.display = 'none'
+						error_box.style.display = 'block'
+
+						if (response.error_type) {
+							error_type = response.error_type
+
+							error_header.innerHTML = "Your payment is overdue so therefore any actions are disabled. Please make your payment on the site"
+						} else {
+							error_header.innerHTML = "There was a problem cloning."
+						}
+					}
+				})
+				.catch((error) => {
+
+				})
+			}
+		}
+
+		function toggle_create_repos_box(action_type)
+		{
+			var hidden_box = document.getElementById("hidden_box")
+			var create_repos_box = document.getElementById("create_repos_box")
+
+			if (action_type == 'open') {
+				hidden_box.style.display = "flex"
+				create_repos_box.style.display = "flex"
+			} else {
+				hidden_box.style.display = "none"
+				create_repos_box.style.display = "none"
+			}
+		}
+
+		function open_confirmation_box(action_type, file_name)
+		{
+			var hidden_box = document.getElementById("hidden_box")
+			var confirmation_box = document.getElementById("confirmation_box")
+			var error_box = document.getElementById("error_box")
+			var header = document.getElementById("confirmation-header")
+			var files_list = document.getElementById("confirmation-fileslist")
+			var num_files_header = document.getElementById("confirmation-num-files")
+			var button_no = document.getElementById("confirmation-button-no")
+			var button_yes = document.getElementById("confirmation-button-yes")
+			var num_files = 0
+
+			header.innerHTML = ""
+			files_list.innerHTML = ""
+			num_files_header.innerHTML = ""
+
+			switch (action_type) {
+				case "commit_files":
+					header.innerHTML = "Are you sure you want to commit the file(s)/folder(s)"
+					local_files.forEach(function (info) {
+						if (file_name == 'all' && info.added) {
+							files_list.innerHTML += "<div class='confirmation-file'>" + repos_name + "/" + info.file_name + "</div>"
+							num_files++
+						} else if (info.file_name == file_name) {
+							files_list.innerHTML = "<div class='confirmation-file'>" + repos_name + "/" + file_name + "</div>"
+							num_files++
+						}
+					})
+
+					num_files_header.innerHTML = "committing " + num_files + " file(s)/folder(s)"
+
+					break
+				case "delete_files":
+					header.innerHTML = "Are you sure you want to delete the committed file(s)/folder(s) ?"
+					committed_files.forEach(function (info) {
+						if (file_name == 'all') {
+							files_list.innerHTML += "<div class='confirmation-file'>" + repos_name + "/" + info.file_name + "</div>"
+							num_files++
+						} else if (info.file_name == file_name) {
+							files_list.innerHTML = "<div class='confirmation-file'>" + repos_name + "/" + file_name + "</div>"
+							num_files++
+						}
+					})
+					num_files_header.innerHTML = "deleting " + num_files + " committed file(s)/folder(s)"
+
+					break
+				case "delete_local_files":
+					header.innerHTML = "Are you sure you want to delete the local file(s)/folder(s) ?"
+					local_files.forEach(function (info) {
+						if (file_name == 'all') {
+							files_list.innerHTML += "<div class='confirmation-file'>" + repos_name + "/" + info.file_name + "</div>"
+							num_files++
+						} else if (info.file_name == file_name) {
+							files_list.innerHTML = "<div class='confirmation-file'>" + repos_name + "/" + file_name + "</div>"
+							num_files++
+						}
+					})
+					num_files_header.innerHTML = "deleting " + num_files + " local file(s)/folder(s)"
+
+					break
+				case "pull_files":
+					header.innerHTML = "Are you sure you want to pull the file(s)/folder(s)"
+					committed_files.forEach(function (info) {
+						if (file_name == 'all') {
+							files_list.innerHTML += "<div class='confirmation-file'>" + repos_name + "/" + info.file_name + "</div>"
+							num_files++
+						} else if (info.file_name == file_name) {
+							files_list.innerHTML = "<div class='confirmation-file'>" + repos_name + "/" + file_name + "</div>"
+							num_files++
+						}
+					})
+
+					num_files_header.innerHTML = "pulling " + num_files + " file(s)/folder(s)"
+
+					break
+			}
+
+			if (header.innerHTML != '') {
+				hidden_box.style.display = "flex"
+				confirmation_box.style.display = 'flex'
+				error_box.style.display = 'none'
+			}
+
+			button_yes.setAttribute("onclick", action_type + "('" + file_name + "')")
+		}
+
+		function reset_committed_list()
+		{
+			var path_list = committed_folder_path
+			var latest_path = committed_path.length - 1
+			var folder_info = path_list[latest_path]
+
+			if (path_list.length > 0) {
+				get_committed_file_info(folder_info["index"], folder_info["folder_name"])
+			} else {
+				get_committed_file_info(0, repos_name)
+			}
+		}
+
+		function close_hidden_box()
+		{
+			var hidden_box = document.getElementById("hidden_box")
+			var confirmation_box = document.getElementById("confirmation_box")
+			var confirmation_progressing = document.getElementById("confirmation-progressing")
+			var error_box = document.getElementById("error_box")
+			var button_yes = document.getElementById("confirmation-button-yes")
+
+			button_yes.onclick = ""
+			hidden_box.style.display = "none"
+			confirmation_box.style.display = "none"
+			confirmation_progressing.style.display = "none"
+			error_box.style.display = "none"
+		}
+
+		function dataURItoBlob(data_uri, file_name, file_type)
+		{
+		    var binary = atob(data_uri.split(',')[1])
+		    var array = [];
+		    for(var i = 0; i < binary.length; i++) {
+		        array.push(binary.charCodeAt(i))
+		    }
+		    var blob = new Blob([new Uint8Array(array)], {type: file_type})
+		    var file = new File([blob], file_name)
+
+		    file.file_name = file_name
+
+		    return file
+		}
+
+		function reset_interface()
+		{
+			var fs = require('fs-extra')
+			var os = require('os')
+			var num_added = added_files.length
+
+			display_local_files(local_files)
+			display_added_files(added_files)
+			display_committed_files(committed_files)
+
+			if (num_added == local_files.length) {
+				add_all_button.style.display = 'none'
+				remove_all_button.style.display = 'block'
+				commit_all_button.style.display = 'block'
+			} else if (num_added > 0) {
+				add_all_button.style.display = 'block'
+				remove_all_button.style.display = 'block'
+				commit_all_button.style.display = 'block'
+			} else {
+				add_all_button.style.display = 'block'
+				remove_all_button.style.display = 'none'
+				commit_all_button.style.display = 'none'
+			}
+
+			if (committed_files.length > 0) {
+				delete_files_all_button.style.display = 'block'
+				pull_all_button.style.display = 'block'
+			} else {
+				delete_files_all_button.style.display = 'none'
+				pull_all_button.style.display = 'none'
+			}
+		}
+
+		function show_success_box(message)
+		{
+			var hidden_box = document.getElementById("hidden_box")
+			var success_box = document.getElementById("success_box")
+			var success_header = document.getElementById("success-header")
+
+			hidden_box.style.display = 'flex'
+			success_box.style.display = 'flex'
+			success_header.innerHTML = message
+
+			setTimeout(function () {
+				hidden_box.style.display = 'none'
+				success_box.style.display = 'none'
+				success_header.innerHTML = ''
+			}, 2000)
+		}
+
+		function display_local_files(files)
+		{
+			var show_list = ''
+
+			files.forEach(function ({ file_name, added, is_dir }) {
+				show_list += "<div class='local_file'>"
+
+				if (added) {
+					show_list += "<div class='file-name'>" + file_name + "</div>";
+					show_list += "<div class='file-actions'>"
+					show_list += "<div class='added_file'>Added</div>"
+
+					if (is_dir) {
+						show_list += "<div class='enter_folder' onclick='get_local_file_info(\"" + local_dir_index + "\", \"" + file_name + "\")'>Go inside directory</div>"
+					}
+				} else {
+					show_list += "<div class='file-name'>" + file_name + "</div>"
+					show_list += "<div class='file-actions'>"
+					show_list += "<div class='add_file' onclick='add_files(\"" + file_name + "\")'>Add</div>"
+
+					show_list += "<div class='delete_file' onclick='open_confirmation_box(\"delete_local_files\", \"" + file_name + "\")'>Delete</div>"
+
+					if (is_dir) {
+						show_list += "<div class='enter_folder' onclick='get_local_file_info(\"" + local_dir_index + "\", \"" + file_name + "\")'>Go inside directory</div>"
+					}
+				}
+
+				show_list += "</div>\n"
+				show_list += "</div>\n"
+			})
+
+			local_files_box.innerHTML = show_list
+		}
+
+		function display_added_files(files)
+		{
+			var added_list = ''
+
+			files.forEach(function ({ file_name, dir }) {
+				added_list += "<div class='file'>"
+				added_list += "<div class='file-name'>" + repos_name + " / ";
+				added_list += dir != "" ? dir.join(" / ") + " / " : "";
+				added_list += file_name + "</div>"
+				added_list += "<div class='file-actions'>"
+				added_list += "<div class='remove_file' onclick='remove_files(\"" + file_name + "\", \"" + dir + "\")'>Remove</div>"
+				added_list += "<div class='commit_file' onclick='open_confirmation_box(\"commit_files\", \"" + file_name + "\")'>Commit</div>"
+				added_list += "</div>"
+				added_list += "</div>\n"
+			})
+
+			added_box.innerHTML = added_list
+		}
+
+		function display_committed_files(files)
+		{
+			var committed_list = ''
+
+			files.forEach(function ({ file_name, is_dir }) {
+				committed_list += "<div class='file'>"
+				committed_list += "<div class='file-name'>" + file_name + "</div>"
+				committed_list += "<div class='file-actions'>"
+				committed_list += "<div class='delete_file' onclick='open_confirmation_box(\"delete_files\", \"" + file_name + "\")'>Delete</div>"
+				committed_list += "<div class='pull_file' onclick='open_confirmation_box(\"pull_files\", \"" + file_name + "\")'>Pull</div>"
+
+				if (is_dir) {
+					committed_list += "<div class='enter_folder' onclick='get_committed_file_info(\"" + committed_dir_index + "\", \"" + file_name + "\")'>Go inside directory</div>"
+				}
+
+				committed_list += "</div>"
+				committed_list += "</div>\n"
+			})
+
+			committed_box.innerHTML = committed_list
+		}
+
+		function get_local_file_info(index, folder_name)
+		{
+			function added_files(file, paths, files, added_files_dir)
+			{
+				var is_dir, all_files, added = false
+				var old_files = new Array(), folder_files
+
+				files.forEach(function (dir_file, index) {
+					if (paths.length > 0) {
+						old_files.push(paths.join("/") + "/" + dir_file)
+					}
+				})
+
+				if (paths.length > 0) {
+					is_dir = fs.lstatSync(user_repos + "/" + paths.join("/") + "/" + file).isDirectory()
+				} else {
+					is_dir = fs.lstatSync(user_repos).isDirectory()
+				}
+				
+				if (is_dir) {
+					if (paths.length > 0) {
+						folder_files = fs.readdirSync(user_repos + "/" + paths.join("/") + "/" + file)
+					} else {
+						folder_files = fs.readdirSync(user_repos)
+					}
+					
+					if (folder_files.indexOf('.DS_Store') > -1) {
+						folder_files.splice(folder_files.indexOf('.DS_Store'), 1)
+					}
+
+					folder_files.forEach(function (folder_file, index) {
+						if (paths.length > 0) {
+							folder_files[index] = paths.join("/") + "/" + file + "/" + folder_file
+						} else {
+							folder_files[index] = folder_file
+						}
+					})
+
+					if (added_files_dir.join("/") == folder_files.join("/")) {
+						added = true
+					}
+				}
+
+				added_files_dir.forEach(function (dir_file) {
+					if (paths.length > 0) {
+						is_dir = fs.lstatSync(user_repos + "/" + dir_file).isDirectory()
+					} else {
+						is_dir = fs.lstatSync(user_repos).isDirectory()
+					}
+
+					if (is_dir) {
+						if (files.indexOf(dir_file) > -1) {
+							added = true
+						} else if (paths.join("/").replace(dir_file) != paths.join("/")) {
+							added = true
+						} else if (paths.join("/") + "/" + file == dir_file) {
+							added = true
+						}
+					} else if (dir_file == paths.join("/") + "/" + file) {
+						added = true
+					}
+				})
+
+				return added
+			}
+
+			var fs = require('fs-extra')
+			var files, path = ""
+			var is_dir, dir_header = document.getElementById("local_directory-header")
+			var k, filt_ext, rename_file, added
+			var folder_exist = false
+			var overlap = false, overlap_index
+			var folder_length = local_folder_path.length
+			var old_path = new Array(), new_path = false
+			var directory
+
+			local_path = []
+
+			local_folder_path.forEach(function (info) {
+				local_path.push(info.folder_name)
+			})
+
+			local_folder_path.forEach(function (info) {
+				if (info.folder_name == folder_name) {
+					if (info.index != index) {
+						new_path = true
+					}
+				}
+			})
+
+			if (local_path.indexOf(folder_name) == -1 || new_path) {
+				if (folder_name != repos_name) {
+					if ((parseInt(index) - 1) == folder_length) {
+						old_path = local_folder_path
+						old_path.push({ index: index, folder_name: folder_name })
+						local_folder_path = old_path
+					} else {
+						local_folder_path.forEach(function (info) {
+							if (info.index < index) {
+								old_path.push(info)
+							}
+						})
+
+						old_path.push({ index: old_path.length + 1, folder_name: folder_name })
+						local_folder_path = old_path
+					}
+				}
+
+				local_path = []
+				old_path.forEach(function (info) {
+					local_path.push(info.folder_name)
+				})
+			} else {
+				if (folder_name != repos_name) {
+					local_path = []
+					local_folder_path.forEach(function (info) {
+						if (info.index <= index) {
+							local_path.push(info.folder_name)
+						}
+					})
+				}
+			}
+
+			local_dir_index = parseInt(index) + 1
+			local_files = []
+
+			files = fs.readdirSync(user_repos + "/" + local_path.join("/"))
+
+			if (files.indexOf('.DS_Store') > -1) {
+				files.splice(files.indexOf('.DS_Store'), 1)
+			}
+
+			files.forEach(function (file) {
+				file_ext = file.split(".")
+
+				if (file_ext.length > 1) {
+					file_ext = "." + file_ext[file_ext.length - 1]
+				} else {
+					file_ext = ""
+				}
+
+				rename_file = ""
+				rename_name_length = Math.floor(Math.random() * 20) + 10
+
+				for (k = 1; k <= rename_name_length; k++) {
+					rename_file += (Math.floor(Math.random() * 9) + 0) / 2 == 0 ? (Math.floor(Math.random() * 9) + 0) : letter[Math.floor(Math.random() * 25) + 0]
+				}
+
+				rename_file += file_ext
+				pre_dir = local_path.length > 0 ? local_path.join("/") + "/" : ""
+				directory = pre_dir
+
+				added = false
+
+				added = added_files(file, local_path, files, added_files_dir)
+					
+				is_dir = fs.lstatSync(user_repos + "/" + directory + "/" + file).isDirectory()
+				local_files.push({ file_name: file, added: added, is_dir: is_dir, dir: local_path, rename_file: rename_file })
+			})
+
+			dir_header.innerHTML = "Directory: Desktop / <strong class='path' onclick='get_local_file_info(\"0\", \"" + repos_name + "\")'>" + repos_name + "</strong> / ";
+
+			local_folder_path.forEach(function ({ index, folder_name }) {
+				dir_header.innerHTML += " <strong class='path' onclick='get_local_file_info(\"" + index + "\", \"" + folder_name + "\")'>" + folder_name + "</strong> / "
+			})
+
+			reset_interface()
+		}
+
+		function get_committed_file_info(index, folder_name)
+		{
+			var fs = require('fs-extra')
+			var form_data = new FormData()
+			var files, path = ""
+			var is_dir, dir_header = document.getElementById("committed_directory-header")
+			var k, filt_ext, rename_file, added
+			var folder_exist = false
+			var overlap = false, overlap_index
+			var folder_length = committed_folder_path.length
+			var file_dir = new Array()
+			var path = "", old_path = new Array()
+			var new_path = false
+
+			committed_path = []
+
+			committed_folder_path.forEach(function (info) {
+				committed_path.push(info.folder_name)
+			})
+
+			committed_folder_path.forEach(function (info) {
+				if (info.folder_name == folder_name) {
+					if (info.index != index) {
+						new_path = true
+					}
+				}
+			})
+
+			if (committed_path.indexOf(folder_name) == -1 || new_path) {
+				if (folder_name != repos_name) {
+					if ((parseInt(index) - 1) == folder_length) {
+						old_path = committed_folder_path
+						old_path.push({ index: index, folder_name: folder_name })
+						committed_folder_path = old_path
+					} else {
+						committed_folder_path.forEach(function (info) {
+							if (info.index < index) {
+								old_path.push(info)
+							}
+						})
+
+						old_path.push({ index: old_path.length + 1, folder_name: folder_name })
+						committed_folder_path = old_path
+					}
+				}
+
+				committed_path = []
+				old_path.forEach(function (info) {
+					committed_path.push(info.folder_name)
+				})
+			} else {
+				if (folder_name != repos_name) {
+					committed_path = []
+					committed_folder_path.forEach(function (info) {
+						if (info.index <= index) {
+							committed_path.push(info.folder_name)
+						}
+					})
+				}
+			}
+
+			committed_dir_index = parseInt(index) + 1
+			committed_files = []
+
+			form_data.append('userid', userid)
+			form_data.append('file_name', folder_name)
+			form_data.append('paths', JSON.stringify(committed_path))
+
+			fetch(link + 'get_committed_path', {
+				method: 'POST',
+				body: form_data
+			})
+			.then((response) => response.json())
+			.then((response) => {
+				var error = response.error
+				var repos_size
+
+				if (!error) {
+					committed_files = response.committed_files
+					repos_size = response.repos_size
+
+					document.getElementById("committed-size").innerHTML = repos_size
+					dir_header.innerHTML = "Directory: <strong class='path' onclick='get_committed_file_info(\"0\", \"" + repos_name + "\")'>" + repos_name + "</strong> / ";
+
+					committed_folder_path.forEach(function ({ index, folder_name }) {
+						dir_header.innerHTML += " <strong class='path' onclick='get_committed_file_info(\"" + index + "\", \"" + folder_name + "\")'>" + folder_name + "</strong> / "
+					})
+
+					reset_interface()
+				}
+			})
+		}
+
+		function get_local_files()
+		{
+			var fs = require('fs-extra')
+			var dir, is_dir, k, filt_ext, rename_file
+
+			local_files = []
+
+			dir = fs.readdirSync(user_repos + "/" + local_path.join("/"))
+
+			if (dir.indexOf('.DS_Store') > -1) {
+				dir.splice(dir.indexOf('.DS_Store'), 1)
+			}
+
+			dir.forEach(function (file, index) {
+				file_ext = file.split(".")
+
+				if (file_ext.length > 1) {
+					file_ext = "." + file_ext[file_ext.length - 1]
+				} else {
+					file_ext = ""
+				}
+
+				rename_file = ""
+				rename_name_length = Math.floor(Math.random() * 20) + 10
+
+				for (k = 1; k <= rename_name_length; k++) {
+					rename_file += (Math.floor(Math.random() * 9) + 0) / 2 == 0 ? (Math.floor(Math.random() * 9) + 0) : letter[Math.floor(Math.random() * 25) + 0]
+				}
+
+				rename_file += file_ext
+
+				is_dir = fs.lstatSync(user_repos + "/" + local_path.join("/") + "/" + file).isDirectory()
+
+				local_files.push({ file_name: file, added: false, is_dir: is_dir, dir: local_path, rename_file: rename_file })
+			})
+
+			added_files = []
+			added_files_dir = []
+
+			reset_interface()
+			close_hidden_box()
+		}
+
+		function get_committed_files()
+		{
+			var form_data = new FormData()
+
+			form_data.append('userid', userid)
+
+			fetch(link + 'get_committed_files', { 
+				method: 'POST',
+				body: form_data
+			})
+			.then((response) => response.json())
+			.then((response) => {
+				var error = response.error
+				var size
+
+				if (!error) {
+					committed_files = response.committed_files
+					repos_size = response.repos_size
+
+					document.getElementById("committed-size").innerHTML = repos_size
+
+					reset_interface()
+				}
+			})
+		}
+
+		function add_files(file_name)
+		{
+			var hidden_box = document.getElementById("hidden_box")
+			var confirmation_box = document.getElementById("confirmation_box")
+			var error_box = document.getElementById("error_box")
+			var error_header = document.getElementById("error-header")
+			var success_box = document.getElementById("success_box")
+			var directory, current_path, is_file_exist = true
+
+			if (file_name == 'all') {
+				added_files = []
+				added_files_dir = []
+
+				local_files.forEach(function (info) {
+                    if (info.dir == '') {
+                        directory = info.file_name
+                    } else {
+                    	directory = info.dir.join("/") + "/" + info.file_name
+                    }
+
+                    if (fs.existsSync(user_repos + "/" + directory) && info.file_name != '.DS_Store') {
+                        info.added = true
+                        added_files.push(info)
+                        added_files_dir.push(directory)
+                    } else {
+                    	is_file_exist = false
+                    }
+                })
+			} else {
+				local_files.forEach(function (info) {
+					if (info.file_name == file_name) {
+						if (info.dir == '') {
+							directory = info.file_name
+						} else {
+							directory = info.dir.join("/") + "/" + info.file_name
+						}
+
+						if (fs.existsSync(user_repos + "/" + directory) && info.file_name != '.DS_Store') {
+							info.added = true
+							added_files.push(info)
+							added_files_dir.push(directory)
+						} else {
+							is_file_exist = false
+						}
+					}
+				})
+			}
+
+			if (!is_file_exist) {
+				hidden_box.style.display = "flex"
+				confirmation_box.style.display = 'none'
+				error_box.style.display = 'flex'
+				success_box.style.display = 'none'
+				error_header.innerHTML = "One of more file(s)/folder(s) you are trying to add doesn't exist. Please press reset to refresh the list and try again"
+			}
+
+			reset_interface()
+		}
+
+		function delete_local_files(file_name)
+		{
+			var fs = require('fs-extra')
+			var os = require('os')
+			var rmdir = require('rimraf')
+			var path = "", directory, files, file_index
+
+			local_folder_path.forEach(function (info) {
+				path += "/" + info.folder_name
+			})
+
+			directory = os.homedir() + "/Desktop/" + repos_name
+			files = fs.readdirSync(directory + path)
+
+			local_files.forEach(function (info, index) {
+				if (file_name == 'all') {
+					if (info.is_dir) {
+						file_index = index
+						rmdir(directory + path + "/" + info.file_name, function () { console.log() })
+					} else {
+						file_index = index
+						fs.unlinkSync(directory + path + "/" + info.file_name)
+					}
+				} else if (info.file_name == file_name) {
+					if (info.is_dir) {
+						file_index = index
+						rmdir(directory + path + "/" + info.file_name, function () { console.log() })
+					} else {
+						file_index = index
+						fs.unlinkSync(directory + path + "/" + info.file_name)
+					}
+				}
+			})
+
+			if (file_name == 'all') {
+				local_files = []
+			} else {
+				local_files.splice(file_index, 1)
+			}
+
+			reset_interface()
+			close_hidden_box()
+		}
+
+		function remove_files(file_name, directory)
+		{
+			var file_index = -1, num_files = 0, is_dir, files
+
+			if (file_name == 'all') {
+				local_files.forEach(function (info) {
+					info.added = false
+				})
+				added_files = []
+				added_files_dir = []
+			} else {
+				num_files = 0
+
+				if (directory) {
+					is_dir = fs.lstatSync(user_repos + "/" + directory.split(",").join("/") + "/" + file_name).isDirectory()
+					directory = user_repos + "/" + directory.split(",").join("/")
+				} else {
+					is_dir = fs.lstatSync(user_repos + "/" + file_name).isDirectory()
+					directory = user_repos
+				}
+
+				if (is_dir) {
+					// if listed
+					local_files.forEach(function (local_info) {
+						if (local_info.dir != '') {
+							if (user_repos + "/" + local_info.dir.join("/") + "/" + local_info.file_name == directory + "/" + file_name) {
+								local_info.added = false
+
+								added_files.forEach(function (info, index) {
+									if (user_repos + "/" + info.dir.join("/") + "/" + info.file_name == user_repos + "/" + local_info.dir.join("/") + "/" + local_info.file_name) {
+										file_index = index
+									}
+								})
+
+								if (file_index > -1) {
+									added_files.splice(file_index, 1)
+									added_files_dir.splice(file_index, 1)
+								}
+
+								file_index = -1
+							}
+						} else {
+							if (user_repos + "/" + local_info.file_name == directory + "/" + file_name) {
+								local_info.added = false
+
+								added_files.forEach(function (info, index) {
+									if (user_repos + "/" + info.file_name == user_repos + "/" + local_info.file_name) {
+										file_index = index
+									}
+								})
+
+								if (file_index > -1) {
+									added_files.splice(file_index, 1)
+									added_files_dir.splice(file_index, 1)
+								}
+
+								file_index = -1
+							}
+						}
+					})
+
+					// remove all files when its directory is remove
+					local_files.forEach(function (local_info) {
+						added_files.forEach(function (added_info, index) {
+							if (added_info.dir != '') {
+								if (local_info.dir.join("/") == added_info.dir.join("/") + "/" + added_info.file_name) {
+									num_files++
+									local_info.added = false
+									file_index = index
+								}
+							} else {
+								if (local_info.dir.join("/") == added_info.file_name) {
+									num_files++
+									local_info.added = false
+									file_index = index
+								}
+							}
+						})
+
+						if (local_files.length == num_files) {
+							added_files.splice(file_index, 1)
+							added_files_dir.splice(file_index, 1)
+						}
+					})
+				} else {
+					// if listed
+					added_files.forEach(function (added_info, index) {
+						if (added_info.dir != '') {
+							if (directory + "/" + file_name == user_repos + "/" + added_info.dir + "/" + added_info.file_name) {
+								local_files.forEach(function (local_info) {
+									if (directory + "/" + file_name == user_repos + "/" + local_info.dir + "/" + local_info.file_name) {
+										local_info.added = false
+										file_index = index
+									}
+								})
+							}
+						} else {
+							if (directory + "/" + file_name == user_repos + "/" + added_info.file_name) {
+								local_files.forEach(function (local_info) {
+									if (directory + "/" + file_name == user_repos + "/" + local_info.file_name) {
+										local_info.added = false
+										file_index = index
+									}
+								})
+							}
+						}
+					})
+
+					if (file_index > -1) {
+						added_files.splice(file_index, 1)
+						added_files_dir.splice(file_index, 1)
+					}
+				}
+			}
+
+			reset_interface()
+		}
+
+		function commit_files(file_name)
+		{
+			document.getElementById("confirmation-progressing").style.display = 'block'
+			document.getElementById("confirmation-button-holder").style.display = 'none'
+
+			var hidden_box = document.getElementById("hidden_box")
+			var confirmation_box = document.getElementById("confirmation_box")
+			var error_box = document.getElementById("error_box")
+			var confirmation_header = document.getElementById("confirmation-header")
+			var error_header = document.getElementById("error-header")
+			var fsUtils = require("nodejs-fs-utils");
+			var fs = require('fs-extra')
+			var rimraf = require('rimraf');
+			var os = require('os')
+			var zipfolder = require('zip-folder')
+			var form_data = new FormData()
+			var committing_files = new Array()
+			var folder_name = "", folder_name_length = Math.floor(Math.random() * 20) + 10, k, sync_dir, create_folder = false, dir_file, file_size, sizes = 0
+			var outside_files = new Array(), non_repos_detected = false, is_dir, repos_sizes = new Array(), oversized = false
+
+			// check for non-repositories
+			outside_files = fs.readdirSync(user_repos)
+
+			outside_files.forEach(function (file) {
+				if (file != ".DS_Store" && file != ".git") {
+					is_dir = fs.lstatSync(user_repos + "/" + file).isDirectory()
+
+					if (!is_dir) {
+						non_repos_detected = true
+					} else {
+						repos_sizes.push({ "repos_name": file, "size": 0 })
+					}
+				}
+			})
+
+			if (!non_repos_detected) {
+				if (file_name == 'all') {
+					committing_files = added_files
+				} else {
+					added_files.forEach(function (info) {
+						if (info.file_name == file_name) {
+							committing_files.push(info)
+						}
+					})
+				}
+
+				committing_files.forEach(function (info) {
+					if (local_path != "") {
+						file_size = fsUtils.fsizeSync(user_repos + "/" + info.dir.join("/") + "/" + info.file_name)
+
+						repos_sizes.forEach(function (repos_info) {
+							if (repos_info.repos_name == info.dir[0]) {
+								repos_info.size += file_size
+							}
+						})
+					} else {
+						file_size = fsUtils.fsizeSync(user_repos + "/" + info.file_name)
+
+						repos_sizes.forEach(function (repos_info) {
+							if (repos_info.repos_name == info.file_name) {
+								repos_info.size += file_size
+							}
+						})
+					}
+				})
+
+				if (repos_sizes.length <= 5) {
+					repos_sizes.forEach(function (repos_info) {
+						if (repos_info.size > repos_size_limit) {
+							oversized = true
+						}
+					})
+
+					if (!oversized) {
+						sync_dir = fs.readdirSync(committing_folder)
+
+						if (sync_dir.length > 0) {
+							folder_name = sync_dir[0]
+						} else {
+							for (k = 1; k <= folder_name_length; k++) {
+								folder_name += (Math.floor(Math.random() * 9) + 0) / 2 == 0 ? (Math.floor(Math.random() * 9) + 0) : letter[Math.floor(Math.random() * 25) + 0]
+							}
+
+							fs.mkdirSync(committing_folder + "/" + folder_name)
+
+							create_folder = true
+						}
+
+						committing_files.forEach(function (info) {
+							if (info.dir.length > 0) {
+								fs.copySync(user_repos + "/" + info.dir.join("/") + "/" + info.file_name, committing_folder + "/" + folder_name + "/" + info.rename_file)
+							} else {
+								fs.copySync(user_repos + "/" + info.file_name, committing_folder + "/" + folder_name + "/" + info.rename_file)
+							}
+						})
+
+						if (create_folder) {
+							fs.writeFileSync(committing_folder + "/directories.txt", JSON.stringify(committing_files))
+							fs.copyFileSync(committing_folder + "/directories.txt", committing_folder + "/" + folder_name + "/directories.txt")
+							fs.unlinkSync(committing_folder + "/directories.txt")
+						} else {
+							dir_file = fs.readFileSync(committing_folder + "/" + folder_name + "/directories.txt")
+							dir_file = JSON.parse(dir_file)
+							dir_file.push(committing_files[0])
+							dir_file = JSON.stringify(dir_file)
+
+							fs.writeFileSync(committing_folder + "/" + folder_name + "/directories.txt", dir_file)
+						}
+
+						zipfolder(committing_folder + "/" + folder_name, committing_folder + "/" + folder_name + ".zip", function (err) {
+							if (!err) {
+								rmdir(committing_folder + "/" + folder_name, function (err) {
+									if (!err) {
+										data = committing_folder + "/" + folder_name + ".zip"
+										image_data = fs.readFileSync(data)
+										image_data = image_data.toString('base64')
+										data_uri = 'data:application/zip;base64,' + image_data
+										file = dataURItoBlob(data_uri, 'files.zip', 'application/zip')
+
+										form_data.append('userid', userid)
+										form_data.append('commit_file', file, folder_name + ".zip")
+										form_data.append('repos_sizes', JSON.stringify(repos_sizes))
+										fs.unlinkSync(committing_folder + "/" + folder_name + ".zip")
+
+										fetch(link + 'commit_file', {
+											method: 'POST',
+											body: form_data
+										})
+										.then((response) => response.json())
+										.then((response) => {
+											var error = response.error
+											var error_type, repos_size
+											var overdue, monthly_neardue, trial_neardue
+											
+											if (!error) {
+												repos_size = response.repos_size
+
+												document.getElementById("committed-size").innerHTML = repos_size
+
+												if (local_path.join("/") == committed_path.join("/")) {
+													committing_files.forEach(function (info) {
+														if (committed_files.indexOf(info) == -1) {
+															committed_files.push(info)
+														}
+													})
+												}
+
+												local_files.forEach(function (info) {
+													added_files.forEach(function ({ file_name, dir }, index) {
+														if (info.dir.join("/") + "/" + info.file_name == dir.join("/") + "/" + file_name) {
+															info.added = false
+															added_files.splice(index, 1)
+														}
+													})
+												})
+
+												reset_interface()
+												close_hidden_box()
+												show_success_box("successfully committed")
+											} else {
+												confirmation_box.style.display = 'none'
+												error_box.style.display = 'block'
+
+												if (response.error_type) {
+													error_type = response.error_type
+
+													switch (error_type) {
+														case "limit":
+															error_header.innerHTML = "You are currently on a trial plan so you are only limited to have 1 repository"
+
+															break
+														case "non_exist":
+															error_header.innerHTML = "You are only limited to 5 repositories for now"
+
+															break
+														case "overload":
+															error_header.innerHTML = "One or more repository you are committing is over sized. The limit is 10MB"
+
+															break
+														case "overdue":
+															error_header.innerHTML = "Your payment is overdue so therefore any actions are disabled. Please make your payment on the site"
+															
+															break
+													}
+												} else {
+													error_header.innerHTML = "There was a problem committing. Please try again"
+												}
+											}
+
+											document.getElementById("confirmation-progressing").style.display = "none"
+											document.getElementById("confirmation-button-holder").style.display = "flex"
+										})
+									}
+								})
+							}
+						})
+					} else {
+						confirmation_box.style.display = 'none'
+						error_box.style.display = 'block'
+						error_header.innerHTML = "One or more repository you are committing is over sized. The limit is 10MB"
+
+						document.getElementById("confirmation-progressing").style.display = "none"
+						document.getElementById("confirmation-button-holder").style.display = "flex"
+					}
+				} else {
+					confirmation_box.style.display = 'none'
+					error_box.style.display = 'block'
+					error_header.innerHTML = "Our paying plan can only limit the users up to 5 repositories for now"
+
+					document.getElementById("confirmation-progressing").style.display = "none"
+					document.getElementById("confirmation-button-holder").style.display = "flex"
+				}
+			} else {
+				confirmation_box.style.display = 'none'
+				error_box.style.display = 'block'
+				error_header.innerHTML = "Your folder '" + repos_name + "' can only contain repository(s). Repository can store file(s)"
+
+				document.getElementById("confirmation-progressing").style.display = "none"
+				document.getElementById("confirmation-button-holder").style.display = "flex"
+			}
+		}
+
+		function delete_files(file_name)
+		{
+			document.getElementById("confirmation-progressing").style.display = 'block'
+			document.getElementById("confirmation-button-holder").style.display = 'none'
+
+			var hidden_box = document.getElementById("hidden_box")
+			var confirmation_box = document.getElementById("confirmation_box")
+			var error_box = document.getElementById("error_box")
+			var error_header = document.getElementById("error-header")
+			var fs = require('fs-extra')
+			var os = require('os')
+			var zipfolder = require('zip-folder')
+			var form_data = new FormData()
+			var deleting_files = new Array()
+
+			if (file_name == 'all') {
+				deleting_files = committed_files
+			} else {
+				committed_files.forEach(function (info) {
+					if (info.file_name == file_name) {
+						deleting_files.push(info)
+					}
+				})
+			}
+
+			fs.writeFileSync(committing_folder + "/directories.txt", JSON.stringify(deleting_files))
+
+			data = committing_folder + "/directories.txt"
+			image_data = fs.readFileSync(data)
+			image_data = image_data.toString('base64')
+			data_uri = 'data:text/plain;base64,' + image_data
+			file = dataURItoBlob(data_uri, 'directories.txt', 'text/plain')
+
+			form_data.append('userid', userid)
+			form_data.append('path', committed_path.join("/"))
+			form_data.append('delete_file', file, "directories.txt")
+			fs.unlinkSync(committing_folder + "/directories.txt")
+
+			fetch(link + 'delete_file', {
+	            method: 'POST',
+	            body: form_data
+	        })
+	        .then((response) => response.json())
+	        .then((response) => {
+	        	var error = response.error
+				var error_type, repos_size
+
+	        	if (!error) {
+					repos_size = response.repos_size
+
+					document.getElementById("committed-size").innerHTML = repos_size
+
+					committed_files = response.committed_files
+
+					reset_interface()
+					close_hidden_box()
+					show_success_box('successfully deleted')						
+	        	} else {
+					confirmation_box.style.display = 'none'
+					error_box.style.display = 'block'
+
+					if (response.error_type) {
+						error_type = response.error_type
+
+						switch (error_type) {
+							case "overdue":
+								error_header.innerHTML = "Your payment is overdue so therefore any actions are disabled. Please make your payment on the site"
+
+								break
+							case "non_exist":
+								error_header.innerHTML = "One of more file(s)/folder(s) you are trying to delete doesn't exist. Please press reset to refresh the list and try again"
+
+								break
+						}
+					} else {
+						error_header.innerHTML = "There was a problem deleting. Please try again"
+					}
+				}
+
+				document.getElementById("confirmation-progressing").style.display = "none"
+				document.getElementById("confirmation-button-holder").style.display = "flex"
+	        })
+	        .catch((error) => {
+
+	        })
+		}
+
+		function pull_files(file_name)
+		{
+			document.getElementById("confirmation-progressing").style.display = 'block'
+			document.getElementById("confirmation-button-holder").style.display = 'none'
+
+			var hidden_box = document.getElementById("hidden_box")
+			var confirmation_box = document.getElementById("confirmation_box")
+			var error_box = document.getElementById("error_box")
+			var error_header = document.getElementById("error-header")
+			var fs = require('fs-extra')
+			var os = require('os')
+			var rmdir = require('rimraf')
+			var unzip = require('unzip')
+			var form_data = new FormData()
+			var path = "", is_exist = false
+
+			committed_path.forEach(function (f_path) {
+				path += "/" + f_path
+			})
+
+			form_data.append('userid', userid)
+			form_data.append('file_name', file_name)
+			form_data.append('path', path)
+
+			fetch(link + 'pull_files', {
+				method: 'POST',
+				body: form_data
+			})
+			.then((response) => response.json())
+			.then((response) => {
+				var error = response.error
+				var error_type, zip_name
+
+				if (!error) {
+					zip_name = response.zip_name
+
+					fs.writeFileSync(committing_folder + "/" + zip_name + ".zip", response.image_data, 'base64')
+					fs.createReadStream(committing_folder + "/" + zip_name + ".zip").pipe(unzip.Extract({ path: user_repos + path }))
+					fs.unlinkSync(committing_folder + "/" + zip_name + ".zip")
+
+					if (local_path.join("/") == committed_path.join("/")) {
+						local_files.forEach(function (info) {
+							if (info.file_name == file_name) {
+								is_exist = true
+							}
+						})
+
+						if (!is_exist) {
+							local_folder_path.forEach(function ({ index, folder_name }) {
+								if ((local_dir_index - 1) == index) {
+									this.get_local_file_info(index, folder_name)
+								}
+							})
+						}
+					}
+
+					reset_interface()
+					close_hidden_box()
+					show_success_box("successfully pulled")
+				} else {
+					confirmation_box.style.display = 'none'
+					error_box.style.display = 'flex'
+
+					if (response.error_type) {
+						error_type = response.error_type
+
+						switch (error_type) {
+							case "overdue":
+								error_header.innerHTML = "Your payment is overdue so therefore any actions are disabled. Please make your payment on the site"
+
+								break
+							case "non_exist":
+								error_header.innerHTML = "One of more file(s)/folder(s) you are trying to pull doesn't exist. Please press reset to refresh the list and try again"
+
+								break
+						}
+					} else {
+						error_header.innerHTML = "There was a problem pulling. Please try again"
+					}
+				}
+
+				document.getElementById("confirmation-progressing").style.display = "none"
+				document.getElementById("confirmation-button-holder").style.display = "flex"
+			})
+			.catch((error) => {
+
+			})
+		}
+
+		var remove_all_button = document.getElementById('remove_all_button')
+		var add_all_button = document.getElementById('add_all_button')
+		var commit_all_button = document.getElementById('commit_all_button')
+		var delete_files_all_button = document.getElementById('delete_files_all_button')
+		var delete_all_button = document.getElementById('delete_all_button')
+		var pull_all_button = document.getElementById('pull_all_button')
+		var local_files_box = document.getElementById("local_files_box")
+		var added_box = document.getElementById("added_box")
+		var committed_box = document.getElementById("committed_box")
+
+		var fs = require('fs-extra')
+		var os = require('os')
+		var help_step = 1, user_repos = os.homedir() + "/Desktop/" + repos_name
+		var committing_folder = os.homedir() + "/.synchub"
+		var local_files = new Array()
+		var added_files = new Array()
+		var committed_files = new Array()
+		var repos_size = 0
+
+		remove_all_button.style.display = 'none'
+		commit_all_button.style.display = 'none'
+		delete_all_button.style.display = 'none'
+		pull_all_button.style.display = 'none'
+
+		if (is_folder_exist()) {
+			is_local_folder_exist()
+
+			document.getElementById("local_directory-header").innerHTML = "Directory: Desktop / <strong class='path' onclick='get_local_file_info(\"0\", \"" + repos_name + "\")'>" + repos_name + "</strong> / "
+			document.getElementById("committed_directory-header").innerHTML = "Directory: <strong class='path' onclick='get_local_file_info(\"0\", \"" + repos_name + "\")'>" + repos_name + "</strong> / "
+
+			var rmdir = require('rimraf')
+			var letter = [
+				'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
+				'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+			]
+			var local_folder_path = [], committed_folder_path = []
+			var local_path = [], committed_path = []
+			var local_dir_index = 1, committed_dir_index = 1
+
+			var added_files_dir = new Array()
+			var zip_dir, dir
+
+			dir = fs.readdirSync(committing_folder)
+
+			dir.forEach(function (folder) {
+				rmdir(committing_folder + "/" + folder, function () { console.log() })
+			})
+
+			get_local_files()
+			get_committed_files()
+		}
+	</script>
+</html>
