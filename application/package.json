@@ -19,7 +19,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^4.0.0"
+    "electron": "^9.1.0"
   },
   "dependencies": {
     "emailjs": "^2.2.0",
